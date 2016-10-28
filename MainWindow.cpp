@@ -24,13 +24,13 @@ constexpr int MAXCHARBUTTON2 = 60;
 vs consonants;
 vs vowels;
 std::string vccv_vowels;
-
 // selection of either \ or / as the separator in folder and file path depending on the OS the tool has been compiled on
 #if (defined (__WIN32__) || defined (_WIN32)) && !defined (__MINGW32__)
-#define SEP '\\'
+    std::string SEP = "\\";
 #else
-#define SEP '/'
+    std::string SEP = "/";
 #endif
+
 
 MainWindow::MainWindow() : QWidget()
 {
@@ -188,73 +188,82 @@ void MainWindow::generationDone(){
 
 // function used to select the input consonant file
 void MainWindow::openCons(){
-    QMessageBox::information(this, "Choose your consonant file", "Please chose your consonnat file");
+//    QMessageBox::information(this, "Choose your consonant file", "Please chose your consonnat file");
     m_inputCons = QFileDialog::getOpenFileName(this, "Choose your consonant file", QString(), "Text (*.txt)");
-    if(m_inputCons != "")
-        QMessageBox::information(this, "", "You opened the file " + m_inputCons);
-    if(m_inputCons.size() > MAXCHARBUTTON && !m_inputCons.isEmpty())
+//    if(m_inputCons != "") {
+//        QMessageBox::information(this, "", "You opened the file " + m_inputCons);
+//    }
+    if(m_inputCons.size() > MAXCHARBUTTON && !m_inputCons.isEmpty()) {
         m_buttonChoseCons->setText("[...] " + m_inputCons.right(MAXCHARBUTTON));
-    else if(!m_inputCons.isEmpty())
+    } else if(!m_inputCons.isEmpty()) {
         m_buttonChoseCons->setText(m_inputCons);
+    }
+
 }
 
 // function used to select the input vowel file
 void MainWindow::openVow(){
-    QMessageBox::information(this, "Choose your vowel file", "Please chose your vowel file");
-    m_inputVow = QFileDialog::getOpenFileName(this, "Choose your vowel file", QString(), "Text (*.txt)");
-    if(m_inputVow != "")
-        QMessageBox::information(this, "", "You opened the file " + m_inputVow);
-    if(m_inputVow.size() > MAXCHARBUTTON && !m_inputVow.isEmpty())
+//    QMessageBox::information(this, "Choose your vowel file", "Please chose your vowel file");
+    m_inputVow = QFileDialog::getOpenFileName(this, "Choose your vowelfile", QString(), "Text (*.txt)");
+//    if(m_inputVow != ""){
+//        QMessageBox::information(this, "", "You opened the file " + m_inputVow);
+//    }
+    if(m_inputVow.size() > MAXCHARBUTTON && !m_inputVow.isEmpty()){
         m_buttonChoseVow->setText("[...] " + m_inputVow.right(MAXCHARBUTTON));
-    else if(!m_inputVow.isEmpty())
+    } else if(!m_inputVow.isEmpty()){
         m_buttonChoseVow->setText(m_inputVow);
+    }
 }
 
 // function used in order to select the output directory
 void MainWindow::openOutDir(){
-    QMessageBox::information(this, "Choose your output directory", "Please chose your output directory");
+//    QMessageBox::information(this, "Choose your output directory", "Please chose your output directory");
     m_outputDir = QFileDialog::getExistingDirectory(this);
-    if(m_outputDir != ""){
-        QMessageBox::information(this, "", "You opened the directory " + m_outputDir);
-    } else {
-        QMessageBox::critical(this, "", "Could not open the folder, please try again.");
-        return;
-    }
+//    if(m_outputDir != ""){
+//        QMessageBox::information(this, "", "You opened the directory " + m_outputDir);
+//    } else {
+//        QMessageBox::critical(this, "", "Could not open the folder, please try again.");
+//        return;
+//    }
 
-    standardize_folder_name(m_outputDir);
+
 
     if(m_outputDir.size() > MAXCHARBUTTON2 && !m_outputDir.isEmpty()){
         m_buttonChoseOutDir->setText("[...] " + m_outputDir.right(MAXCHARBUTTON2));
     }
-    else if(!m_outputDir.isEmpty())
+    else if(!m_outputDir.isEmpty()){
         m_buttonChoseOutDir->setText(m_outputDir);
+    }
 }
 
 // displays an error message if a file could not be loaded
-const int MainWindow::return_error(const int error_code) noexcept {
+const void MainWindow::return_error(const int& error_code) noexcept {
     const QString title{"Fatal Error"};
     switch (error_code) {
         case 1:
             QMessageBox::critical(this, title, "Error:\nThe consonant input file (\"consonant.txt" + ERROR_MESSAGE);
-            return error_code;
+            return;
 
         case 2:
             QMessageBox::critical(this, title, "Error:\nThe vowel input file (\"vowels.txt" + ERROR_MESSAGE);
-            return error_code;
+            return;
 
         case 3:
             QMessageBox::critical(this, title, "Error:\nThe reclist output could not be written (\"reclist.txt" + ERROR_MESSAGE);
-            return error_code;
+            return;
 
         case 4:
             QMessageBox::critical(this, title, "Error:\nThe oto.ini output file could not be written (\"oto.ini" + ERROR_MESSAGE);
+            return;
+
+        case 5:
+            QMessageBox::critical(this, title, "Error:\nA ust file couldn't be written." + ERROR_MESSAGE);
+            return;
 
         default:
             QMessageBox::critical(this, title, "Error:\nA file" + ERROR_MESSAGE);
-            break;
+            return;
     }
-
-    return 0;
 }
 
 
@@ -266,20 +275,35 @@ const int MainWindow::return_error(const int error_code) noexcept {
 using namespace std;
 void MainWindow::generate(){
     ifstream in_consonants{m_inputCons.toStdString()}, in_vowels{m_inputVow.toStdString()};
-
     if(m_outputDir == "" || m_inputCons == "" || m_inputVow == ""){
         QMessageBox::critical(this, "Error in selected file", "Error:\nYou haven't chosen either a file or an output directory.\nPlease check your settings and try again.");
         return;
     }
-
-
-
+    // if there is any issue with the output file, end the generation
+    if(!in_consonants){
+        return_error(1);
+        return;
+    } else if (!in_vowels){
+        return_error(2);
+        return;
+    }
+    // for debug purpose only
+//    QMessageBox::information(this, "", m_outputDir + QString::fromStdString(SEP) + "reclist.txt");
     ofstream reclist{m_outputDir.toStdString() + SEP + "reclist.txt"}, otoini{m_outputDir.toStdString() + SEP + "oto.ini"};
+    // if there is any issue with the output file, end the generation
+    if(!reclist) {
+        return_error(3);
+        return;
+    } else if(!otoini){
+        return_error(4);
+        return;
+    }
+
 
     load_phonemes(in_consonants, in_vowels);
 
+    // this part is used for debug purposes
     string recap{"Alright, here is the recap so far: \n\n\tConsonants:\n\n"};
-
     REP(i, 0u, consonants.size()){
         recap += consonants[i];
         if((i+1)%5 == 0 && i != 0){
@@ -288,9 +312,7 @@ void MainWindow::generate(){
             recap += "\t";
         }
     }
-
     recap += "\n\n\tVowels:\n\n";
-
     REP(i, 0u, vowels.size()){
         recap += vowels[i] + "\t";
         if((i+1)%5 == 0 && i != 0){
@@ -298,12 +320,14 @@ void MainWindow::generate(){
         }
     }
     recap += "\n";
-
     recap += "\nInput files:\n" + m_inputCons.toStdString() + "\n" + m_inputVow.toStdString() + "\n";
     recap += "\nOutput directory:\n" + m_outputDir.toStdString() + "\n";
-
     QMessageBox::information(this, "Recap", QString::fromStdString(recap));
 
-    openfolder(m_outputDir.toStdString());
+    /*
+     * generation of the reclist, oto.ini and ust's goes there
+     * */
+
+    openfolder(standardize_name(m_outputDir).toStdString());
     return;
 }

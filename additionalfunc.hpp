@@ -25,10 +25,10 @@
 // replaces all substrings in a string to another substring
 std::string replaceAll(std::string str, const std::string&& from, const std::string&& to);
 
-void standardize_folder_name(QString &str);
+QString standardize_name(QString str);
 
 // opens with the default file manager the output folder
-void openfolder(const std::string &folder) noexcept;
+void openfolder(const std::string &&folder) noexcept;
 
 // loads the phonemes from the input files
 void load_phonemes(std::ifstream& in_consonants, std::ifstream& in_vowels) noexcept;

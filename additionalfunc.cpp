@@ -35,20 +35,18 @@ std::string replaceAll(std::string str, const std::string&& from, const std::str
     return str;
 }
 
-void standardize_folder_name(QString &str){
+QString standardize_name(QString str){
 #if (defined (__WIN32__) || defined (_WIN32)) && !defined (__MINGW32__)
-    str = "\"" + str + "\"";
+    return "\"" + str + "\"";
 #else
     if(str.isEmpty()){
-        return;
+        return "";
     }
-    str = QString::fromStdString(replaceAll(str.toStdString(), " ", "\\ "));
+    return QString::fromStdString(replaceAll(str.toStdString(), " ", "\\ "));
 #endif
-
-    return;
 }
 
-void openfolder(const std::string &folder) noexcept {
+void openfolder(const std::string &&folder) noexcept {
     string command;
 
     // the system command is chosen depending on the OS the software has been compiled on
@@ -135,6 +133,10 @@ std::ofstream generateUST(const RecType recordingType, int& filecounter, int& no
     notecounter = 3;
     ofstream file(filename);
 
+    if(!file){
+        QMessageBox::critical(nullptr, "Error", "Error while writting a ust file, please check if you have the rights writing into the output folder and/or if there is already a file with the same name opened in another process.");
+    }
+
     file << UST_HEADER[0] << recType << " debug" << UST_HEADER[1] << filename << UST_HEADER[2];
 
     return file;
@@ -195,19 +197,4 @@ void writeRecOto(std::ofstream &reclist, std::ofstream &otoini, std::ofstream &u
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

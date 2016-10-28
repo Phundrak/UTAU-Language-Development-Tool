@@ -25,7 +25,7 @@ Q_OBJECT
 public:
     MainWindow();
 
-    const int return_error(const int error_code) noexcept ;
+    const void return_error(const int& error_code) noexcept ;
 private:
     // methods
 
@@ -69,7 +69,7 @@ private:
     QString m_vccv_vowel;
 
     // generic part of the message if a file could not be opened (writing or reading)
-    const QString ERROR_MESSAGE = "\") could not be opened. Please check that this file\nexist in the same directory as this tool. It might also be opened in another software\nwhich prevents the file from being opened by another software (such as this tool). Please\nclose it first and after that run again this tool.\n";
+    const QString ERROR_MESSAGE = "\") could not be opened. Please check that this file exist in the same directory as this tool. It might also be opened in another software which prevents the file from being opened by another software (such as this tool). Please close it first and after that run again this tool.  \n";
 
 signals:
     void done();
