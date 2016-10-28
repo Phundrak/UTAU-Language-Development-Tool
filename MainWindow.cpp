@@ -301,6 +301,19 @@ void MainWindow::generate(){
 
 
     load_phonemes(in_consonants, in_vowels);
+    if(m_buttonVCCV->isChecked()){
+        QStringList q_list_vowels;
+        for(auto vowel : vowels){
+            q_list_vowels.append(QString::fromStdString(vowel));
+        }
+        bool ok;
+        QString vccv_vowel = QInputDialog::getItem(this, tr("QInputDialog::getItem()"), tr("VCCV vowel:"), q_list_vowels, 0, false, &ok);
+        if(ok && !vccv_vowel.isEmpty()){
+            m_vccv_vowel = vccv_vowel;
+        } else {
+            QMessageBox::critical(this, "No vowel chosen", "Error:\nNo vowel was chosen for the VCCV recordings. Please try again and choose a vowel.");
+        }
+    }
 
     // this part is used for debug purposes
     string recap{"Alright, here is the recap so far: \n\n\tConsonants:\n\n"};
