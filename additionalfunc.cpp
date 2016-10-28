@@ -14,32 +14,59 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the ULDT.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "stdafx.hpp"
 
 using namespace std;
 
-void openfolder(const char* folder){
-    char *command;
+std::string replaceAll(std::string str, const std::string&& from, const std::string&& to) {
+    if (str.empty()) {    //if the string from is empty, there is no need to process it
+        return "";
+    } else if(from.empty()){
+        return str;
+    }
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+    }
+    return str;
+}
 
+void standardize_folder_name(QString &str){
 #if (defined (__WIN32__) || defined (_WIN32)) && !defined (__MINGW32__)
-    command = (char *) "explorer.exe ";
+    str = "\"" + str + "\"";
 #else
-    command = (char *) "xdg-open";
+    if(str.isEmpty()){
+        return;
+    }
+    str = QString::fromStdString(replaceAll(str.toStdString(), " ", "\\ "));
 #endif
 
-    char cmdcommand[100];
-    strcpy(cmdcommand, command);
-    strcpy(cmdcommand, folder);
-    std::system(cmdcommand);
     return;
 }
 
-void load_phonemes(ifstream& in_consonants, ifstream& in_vowels){
+void openfolder(const std::string &folder) noexcept {
+    string command;
+
+    // the system command is chosen depending on the OS the software has been compiled on
+#if (defined (__WIN32__) || defined (_WIN32)) && !defined (__MINGW32__)
+    command = "explorer.exe ";
+#else
+    command = "xdg-open ";
+#endif
+    string cmdcommand = command + folder;
+    QMessageBox::information(nullptr, "", QString::fromStdString(cmdcommand));
+    std::system(cmdcommand.c_str());
+    return;
+}
+
+void load_phonemes(ifstream& in_consonants, ifstream& in_vowels) noexcept{
     string line;
     while (getline(in_consonants, line)){
+        // if a line begins with a blank character, a number sign or if the line is empty, it will be ignored
         if(line[0] != ' ' && line[0] != '#' && line != ""){
             consonants.push_back(line);
         }
@@ -168,7 +195,6 @@ void writeRecOto(std::ofstream &reclist, std::ofstream &otoini, std::ofstream &u
 
 
 }
-
 
 
 

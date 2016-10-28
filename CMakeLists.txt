@@ -24,7 +24,7 @@ set(CMAKE_AUTOMOC ON)
 
 project(ULDT_GUI)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14 -O3")
 
 set(SOURCE_FILES main.cpp stdafx.hpp MainWindow.cpp MainWindow.hpp additionalfunc.cpp additionalfunc.hpp global.cpp global.hpp)
 add_executable(ULDT_GUI ${SOURCE_FILES} stdafx.hpp MainWindow.cpp MainWindow.hpp)

@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the ULDT.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -30,6 +30,8 @@ private:
     // methods
 
     // members
+
+    // declaration of the GUI elements
     QGridLayout *m_mainLayout;
     QGridLayout *m_recTypeLayout;
 
@@ -62,12 +64,14 @@ private:
     QString m_outputDir;
     QString m_inputCons;
     QString m_inputVow;
+
+    // will be used in the VCCV generation, not yet used
     QString m_vccv_vowel;
 
-    const QString ERROR_MESSAGE = "\") could not be open. Please check that this file\n\texist in the same directory as this tool. It might also be opened in another software\n\twhich prevents the file from being opened by another software (such as this tool). Please\n\tclose it first and after that run again this tool.\n\n\t";
+    // generic part of the message if a file could not be opened (writing or reading)
+    const QString ERROR_MESSAGE = "\") could not be opened. Please check that this file\nexist in the same directory as this tool. It might also be opened in another software\nwhich prevents the file from being opened by another software (such as this tool). Please\nclose it first and after that run again this tool.\n";
 
 signals:
-    bool check(bool);
     void done();
 
 public slots:
@@ -80,5 +84,4 @@ public slots:
     void estimateGenerationDone(int progression);
     void updateNumSyl(int i);
 };
-
 

@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the ULDT.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 // TODO: comment all of this before it's too late, add the reclist, otoini and ust generation and stuff, pretty much only the GUI has been made so far. The generators should be added shortly (already written in another project)
@@ -25,8 +25,8 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 
+    // just launches the GUI, nothing spectacular to see here, everything happen in the other files
     QApplication app(argc, argv);
-
     MainWindow window;
     window.show();
 

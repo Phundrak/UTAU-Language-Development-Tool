@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the ULDT.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "stdafx.hpp"
@@ -25,6 +25,7 @@ vs consonants;
 vs vowels;
 std::string vccv_vowels;
 
+// selection of either \ or / as the separator in folder and file path depending on the OS the tool has been compiled on
 #if (defined (__WIN32__) || defined (_WIN32)) && !defined (__MINGW32__)
 #define SEP '\\'
 #else
@@ -132,6 +133,7 @@ MainWindow::MainWindow() : QWidget()
     // if the slider is moved, the value next to it is modified
     QObject::connect(m_numberSyl, SIGNAL(valueChanged(int)), this, SLOT(updateNumSyl(int)));
 
+    // these call the functions used to select the input files and the output directory
     QObject::connect(m_buttonChoseCons, SIGNAL(clicked(bool)), this, SLOT(openCons()));
     QObject::connect(m_buttonChoseVow, SIGNAL(clicked(bool)), this, SLOT(openVow()));
     QObject::connect(m_buttonGenerate, SIGNAL(clicked(bool)), this, SLOT(generate()));
@@ -139,6 +141,7 @@ MainWindow::MainWindow() : QWidget()
     //makes the application close if the Quit button is clicked
     QObject::connect(m_buttonQuit, SIGNAL(clicked(bool)), qApp, SLOT(quit()));
 
+    // if the CVVC option is selected, it will automatically select the CV and VC options
     QObject::connect(m_buttonCVVC, SIGNAL(toggled(bool)), m_buttonCV, SLOT(setDisabled(bool)));
     QObject::connect(m_buttonCVVC, SIGNAL(toggled(bool)), m_buttonCV, SLOT(setChecked(bool)));
     QObject::connect(m_buttonCVVC, SIGNAL(toggled(bool)), m_buttonVC, SLOT(setDisabled(bool)));
@@ -149,32 +152,41 @@ MainWindow::MainWindow() : QWidget()
     QObject::connect(m_buttonVCCV, SIGNAL(toggled(bool)), m_buttonCVVC, SLOT(setChecked(bool)));
     QObject::connect(m_buttonVCCV, SIGNAL(toggled(bool)), m_buttonCVVC, SLOT(setDisabled(bool)));
 
+    // this is supposed to show progress in the progress bars, not sure these will be used though
     QObject::connect(m_mainProgress, SIGNAL(valueChanged(int)), this, SLOT(estimateGenerationDone(int)));
+    // calls the end of generation function which will tell the user the tool finished running
     QObject::connect(this, SIGNAL(done()), this, SLOT(generationDone()));
 
+    // choose the output directory
     QObject::connect(m_buttonChoseOutDir, SIGNAL(clicked(bool)), this, SLOT(openOutDir()));
 
 }
 
+// until the VV checkbox is checked, the stationaries checkbox is checked and grayed out
+// it becomes available and modifiable if the VV checkbox
 void MainWindow::vvChecked(bool checked){
     m_buttonStat->setChecked(!checked);
     m_buttonStat->setDisabled(!checked);
 }
 
+// if the main progress bar is full, calls the function telling the user the tool is done running
 void MainWindow::estimateGenerationDone(int progression){
     if(progression >= 100)
-        emit done();
+            emit done();
 }
 
+// this function updates the value selected with the slider displayed in the label next to it
 void MainWindow::updateNumSyl(int i) {
     m_labelValNumSyl->setText(QString::number(i));
 }
 
+// function called once the generation is done
 void MainWindow::generationDone(){
     QMessageBox::information(this, "Done", "The generation of your files is done!");
     qApp->quit();
 }
 
+// function used to select the input consonant file
 void MainWindow::openCons(){
     QMessageBox::information(this, "Choose your consonant file", "Please chose your consonnat file");
     m_inputCons = QFileDialog::getOpenFileName(this, "Choose your consonant file", QString(), "Text (*.txt)");
@@ -186,6 +198,7 @@ void MainWindow::openCons(){
         m_buttonChoseCons->setText(m_inputCons);
 }
 
+// function used to select the input vowel file
 void MainWindow::openVow(){
     QMessageBox::information(this, "Choose your vowel file", "Please chose your vowel file");
     m_inputVow = QFileDialog::getOpenFileName(this, "Choose your vowel file", QString(), "Text (*.txt)");
@@ -197,6 +210,7 @@ void MainWindow::openVow(){
         m_buttonChoseVow->setText(m_inputVow);
 }
 
+// function used in order to select the output directory
 void MainWindow::openOutDir(){
     QMessageBox::information(this, "Choose your output directory", "Please chose your output directory");
     m_outputDir = QFileDialog::getExistingDirectory(this);
@@ -206,6 +220,9 @@ void MainWindow::openOutDir(){
         QMessageBox::critical(this, "", "Could not open the folder, please try again.");
         return;
     }
+
+    standardize_folder_name(m_outputDir);
+
     if(m_outputDir.size() > MAXCHARBUTTON2 && !m_outputDir.isEmpty()){
         m_buttonChoseOutDir->setText("[...] " + m_outputDir.right(MAXCHARBUTTON2));
     }
@@ -213,6 +230,7 @@ void MainWindow::openOutDir(){
         m_buttonChoseOutDir->setText(m_outputDir);
 }
 
+// displays an error message if a file could not be loaded
 const int MainWindow::return_error(const int error_code) noexcept {
     const QString title{"Fatal Error"};
     switch (error_code) {
@@ -242,20 +260,23 @@ const int MainWindow::return_error(const int error_code) noexcept {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-/// main body of the generation algorithm
+/// body of the function called once the "generate" button is clicked
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 using namespace std;
 void MainWindow::generate(){
-    ifstream in_consonats{m_inputCons.toStdString()}, in_vowels{m_inputVow.toStdString()};
+    ifstream in_consonants{m_inputCons.toStdString()}, in_vowels{m_inputVow.toStdString()};
 
     if(m_outputDir == "" || m_inputCons == "" || m_inputVow == ""){
         QMessageBox::critical(this, "Error in selected file", "Error:\nYou haven't chosen either a file or an output directory.\nPlease check your settings and try again.");
         return;
     }
+
+
+
     ofstream reclist{m_outputDir.toStdString() + SEP + "reclist.txt"}, otoini{m_outputDir.toStdString() + SEP + "oto.ini"};
 
-    load_phonemes(in_consonats, in_vowels);
+    load_phonemes(in_consonants, in_vowels);
 
     string recap{"Alright, here is the recap so far: \n\n\tConsonants:\n\n"};
 
@@ -278,8 +299,11 @@ void MainWindow::generate(){
     }
     recap += "\n";
 
+    recap += "\nInput files:\n" + m_inputCons.toStdString() + "\n" + m_inputVow.toStdString() + "\n";
+    recap += "\nOutput directory:\n" + m_outputDir.toStdString() + "\n";
+
     QMessageBox::information(this, "Recap", QString::fromStdString(recap));
 
-    openfolder(m_outputDir.toStdString().c_str());
+    openfolder(m_outputDir.toStdString());
     return;
 }
