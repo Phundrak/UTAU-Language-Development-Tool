@@ -5,7 +5,7 @@ aimed at UTAU vocal library developers by providing them an easy way of
 creating recording lists, a pre-configured oto.ini file and test ust 
 files.
 
-Requires Qt5 to be compiled.
+Requires Qt5.
 
 This tool is still in a prototype state and isn't yet usable. It has
 been for now only been tested under the GNU/Linux environment.
