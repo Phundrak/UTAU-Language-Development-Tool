@@ -21,7 +21,7 @@
 
 using namespace std;
 
-void generate_cv(std::ofstream &reclist, std::ofstream &otoini) {
+void generate_cv(std::ofstream &reclist, std::ofstream &otoini) noexcept {
     string filename;
     string alias;
     int filecounter = 0;
@@ -47,7 +47,7 @@ void generate_cv(std::ofstream &reclist, std::ofstream &otoini) {
     return;
 }
 
-void generate_cvvc(std::ofstream &reclist, std::ofstream &otoini) {
+void generate_cvvc(std::ofstream &reclist, std::ofstream &otoini) noexcept {
     string filename;
     string alias;
     int filecounter = 0;
@@ -82,7 +82,7 @@ void generate_cvvc(std::ofstream &reclist, std::ofstream &otoini) {
     return;
 }
 
-void generate_vv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_MAX) {
+void generate_vv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_MAX) noexcept {
     string filename;
     //string alias;
     int filecounter = 0, notecounter = 0, reccounter = 0, sylCount = 0;
@@ -140,7 +140,7 @@ void generate_vv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_M
     return;
 }
 
-void generate_v(std::ofstream &reclist, std::ofstream &otoini) {
+void generate_v(std::ofstream &reclist, std::ofstream &otoini) noexcept {
     string filename;
     string alias;
     int filecounter = 0, notecounter = 0, recCounter = 0;
@@ -159,10 +159,17 @@ void generate_v(std::ofstream &reclist, std::ofstream &otoini) {
     return;
 }
 
-void generate_vcv(std::ofstream &reclist, std::ofstream otoini, const int &SYL_MAX, const string &outputDir) {
-    
+void generate_vcv(std::ofstream &reclist, std::ofstream otoini, const int &SYL_MAX, const string &outputDir) noexcept {
+    string filename;
+    //string alias;
+    int filecounter = 0, notecounter = 0, reccounter = 0, sylCount = 0;
+    vector<string> syllables;
+    ofstream ust = generateUST(RecType::VV, filecounter, notecounter);
+
+
+    return;
 }
-void generate_vccv(std::ofstream &reclist, std::ofstream &otoini, const std::string &VCCV_SYL, const int &SYL_MAX) {
+void generate_vccv(std::ofstream &reclist, std::ofstream &otoini, const std::string &VCCV_SYL, const int &SYL_MAX) noexcept {
     string filename;
     string alias;
     int filecounter = 0, notecounter = 0, recCounter = 0, sylCount = 0;

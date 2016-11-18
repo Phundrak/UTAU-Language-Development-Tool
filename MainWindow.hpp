@@ -25,7 +25,7 @@ Q_OBJECT
 public:
     MainWindow();
 
-    const void return_error(const int& error_code) noexcept ;
+    const void return_error(const int& error_code) noexcept;
 private:
     // methods
 

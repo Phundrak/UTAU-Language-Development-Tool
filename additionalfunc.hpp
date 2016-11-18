@@ -23,10 +23,10 @@
 #include "global.hpp"
 
 // replaces all substrings in a string to another substring
-std::string replaceAll(std::string str, const std::string&& from, const std::string&& to);
+std::string replaceAll(std::string str, const std::string&& from, const std::string&& to) noexcept;
 
 // standardizes the name of the output folder so that the folder can be opened at the end of the generation
-QString standardize_name(QString str);
+QString standardize_name(QString str) noexcept;
 
 // opens with the default file manager the output folder
 // NOT IN USE ANYMORE

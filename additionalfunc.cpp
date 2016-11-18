@@ -22,7 +22,7 @@
 
 using namespace std;
 
-std::string replaceAll(std::string str, const std::string&& from, const std::string&& to) {
+std::string replaceAll(std::string str, const std::string&& from, const std::string&& to) noexcept {
     if (str.empty()) {    //if the string from is empty, there is no need to process it
         return "";
     } else if(from.empty()){
@@ -36,7 +36,7 @@ std::string replaceAll(std::string str, const std::string&& from, const std::str
     return str;
 }
 
-QString standardize_name(QString str){
+QString standardize_name(QString str) noexcept {
 #if (defined (__WIN32__) || defined (_WIN32)) && !defined (__MINGW32__)
     return "\"" + str + "\"";
 #else
