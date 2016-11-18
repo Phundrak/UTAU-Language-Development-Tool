@@ -18,6 +18,7 @@
  */
 
 #include "stdafx.hpp"
+#include "global.hpp"
 
 using namespace std;
 
@@ -46,8 +47,8 @@ QString standardize_name(QString str){
 #endif
 }
 
-void openfolder(const std::string &&folder) noexcept {
-    string command;
+void openfolder(const QString &folder) noexcept {
+    QString command;
 
     // the system command is chosen depending on the OS the software has been compiled on
 #if (defined (__WIN32__) || defined (_WIN32)) && !defined (__MINGW32__)
@@ -55,9 +56,9 @@ void openfolder(const std::string &&folder) noexcept {
 #else
     command = "xdg-open ";
 #endif
-    string cmdcommand = command + folder;
-    QMessageBox::information(nullptr, "", QString::fromStdString(cmdcommand));
-    std::system(cmdcommand.c_str());
+    QString cmdcommand = command + folder;
+    // QMessageBox::information(nullptr, "", QString::fromStdString(cmdcommand));
+    std::system(standardize_name(cmdcommand).toStdString().c_str());
     return;
 }
 
@@ -131,7 +132,7 @@ std::ofstream generateUST(const RecType recordingType, int& filecounter, int& no
     }
     const string filename = recType + "_" + to_string(++filecounter) + "_debug.ust";
     notecounter = 3;
-    ofstream file(filename);
+    ofstream file(OUTPUT_DIR + filename);
 
     if(!file){
         QMessageBox::critical(nullptr, "Error", "Error while writting a ust file, please check if you have the rights writing into the output folder and/or if there is already a file with the same name opened in another process.");

@@ -38,3 +38,12 @@ const string NOTE_BODY[5]{
 };
 
 const string OTO_BODY = ".wav=";
+
+string OUTPUT_DIR = "";
+
+// selection of either \ or / as the separator in folder and file path depending on the OS the tool has been compiled on
+#if (defined (__WIN32__) || defined (_WIN32)) && !defined (__MINGW32__)
+constexpr std::string SEP = "\\";
+#else
+const std::string SEP = "/";
+#endif

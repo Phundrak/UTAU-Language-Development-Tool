@@ -1,0 +1,170 @@
+/*
+ * Copyright © 2016-2017 Lucien Cartier-Tilet
+ *
+ * This file is part of the UTAU Language Development Tool (ULDT).
+ *
+ * The ULDT is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The ULDT is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the ULDT.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "stdafx.hpp"
+
+using namespace std;
+
+void generate_cv(std::ofstream &reclist, std::ofstream &otoini, const string &outputDir) {
+    string filename;
+    string alias;
+    int filecounter = 0;
+    int notecounter = 0;
+    int recCounter = 0;
+    ofstream ust = generateUST(RecType::CV, filecounter, notecounter);
+
+    for(size_t i = 0; i < consonants.size(); i++){
+        for(size_t j = 0; j < vowels.size(); j++){
+            if(notecounter > 950){
+                ust = generateUST(RecType::CV, filecounter, notecounter, ust);
+            }
+            alias = consonants[i] + vowels[j];
+            filename = "CV" + num_to_string(++recCounter) + "_" + alias;
+            reclist << filename + "\n";
+            writeAlias(otoini, filename, alias, OtoType::CV);
+            writeNote(ust, ++notecounter, filecounter, RecType::CV, NoteLength::full, alias);
+            writeNote(ust, ++notecounter, filecounter, RecType::CV, NoteLength::full, "R");
+        }
+    }
+
+    closeUST(ust);
+    return;
+}
+
+void generate_cvvc(std::ofstream &reclist, std::ofstream &otoini, const string &outputDir) {
+    string filename;
+    string alias;
+    int filecounter = 0;
+    int notecounter = 0;
+    int recCounter = 0;
+    ofstream ust = generateUST(RecType::CVVC, filecounter, notecounter);
+
+    for(size_t i = 0; i < consonants.size(); i++){
+        bool silToCons = false;
+        for(size_t j = 0; j < vowels.size(); j++){
+            if(notecounter > 950){
+                ust = generateUST(RecType::CVVC, filecounter, notecounter, ust);
+            }
+            filename = "CVVC" + num_to_string(++recCounter) + "_" + consonants[i] + vowels[j] + consonants[i] + vowels[j];
+            reclist << filename + "\n";
+            if(!silToCons){
+                writeAlias(otoini, filename, "- " + consonants[i], OtoType::CV);
+                writeAlias(otoini, filename, consonants[i] + " R", OtoType::VC);
+                silToCons = true;
+            }
+            writeAlias(otoini, filename, "- " + consonants[i] + vowels[j], OtoType::CV);
+            writeAlias(otoini, filename, vowels[j] + consonants[i], OtoType::VCC);
+            writeAlias(otoini, filename, consonants[i] + vowels[j], OtoType::CCV);
+            writeAlias(otoini, filename, vowels[j] + consonants[i] + " R", OtoType::VC);
+            writeNote(ust, ++notecounter, filecounter, RecType::CVVC, NoteLength::full, "- " + consonants[i] + vowels[j]);
+            writeNote(ust, ++notecounter, filecounter, RecType::CVVC, NoteLength::quarter, vowels[j] + consonants[i]);
+            writeNote(ust, ++notecounter, filecounter, RecType::CVVC, NoteLength::full, consonants[i] + vowels[j]);
+            writeNote(ust, ++notecounter, filecounter, RecType::CVVC, NoteLength::half, vowels[j] + consonants[i] + " R");
+            writeNote(ust, ++notecounter, filecounter, RecType::CV, NoteLength::large, "R");
+        }
+    }
+    return;
+}
+
+void generate_vv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_MAX, const string &outputDir) {
+    string filename;
+    //string alias;
+    int filecounter = 0;
+    int notecounter = 0;
+    int reccounter = 0;
+    int sylCount = 0;
+    vector<string> syllables;
+    ofstream ust = generateUST(RecType::VV, filecounter, notecounter);
+    for(size_t i = 0; i < vowels.size(); i++){
+        bool toSil = false;
+
+
+        filename = "VV" + num_to_string(++reccounter) + "_-";
+        sylCount++;
+
+        for(size_t j = 0 + i; j < vowels.size(); j++){
+            // if we have too much notes in the ust, creates a new ust file
+            if(notecounter > 950){
+                ust = generateUST(RecType::VV, filecounter, notecounter, ust);
+            }
+            // if we reach the max number of syllables, we create a new recording
+            if(sylCount >= SYL_MAX - 1){
+                if(!toSil){
+                    syllables.push_back(vowels[i] + " -");
+                    filename += " -";
+                    toSil = true;
+                }
+                writeRecOto(reclist, otoini, ust, notecounter, filecounter, RecType::VV, filename, syllables, OtoType::VV);
+                while (syllables.size() > 0){
+                    syllables.pop_back();
+                }
+                sylCount = 0;
+                filename = "VV" + num_to_string(++reccounter) + "_" + vowels[i];
+            }
+
+            if(j == 0 + i){
+                syllables.push_back("- " + vowels[i]);
+            }
+
+            filename += " " + vowels[j] + " " + vowels[i];
+            if (j != 0 + i) syllables.push_back(vowels[i] + " " + vowels[j]);
+            syllables.push_back(vowels[j] + " " + vowels[i]);
+            sylCount += 2;
+        }
+
+        if(!toSil){
+            syllables.push_back(vowels[i] + " -");
+            toSil = true;
+        }
+        writeRecOto(reclist, otoini, ust, notecounter, filecounter, RecType::VV, filename, syllables, OtoType::VV);
+        while (syllables.size() > 0){
+            syllables.pop_back();
+        }
+        sylCount = 0;
+    }
+
+    closeUST(ust);
+    return;
+}
+
+void generate_v(std::ofstream &reclist, std::ofstream &otoini, const string &outputDir) {
+    string filename;
+    string alias;
+    int filecounter = 0, notecounter = 0, recCounter = 0;
+    ofstream ust = generateUST(RecType::V, filecounter, notecounter);
+
+    for(size_t i = 0; i < vowels.size(); i++){
+        if(notecounter > 950){
+            ust = generateUST(RecType::V, filecounter, notecounter, ust);
+        }
+        filename = "V" + num_to_string(++recCounter) + "_" + vowels[i];
+        reclist << filename + "\n";
+        writeAlias(otoini, filename, vowels[i], OtoType::V);
+        writeNote(ust, ++notecounter, filecounter, RecType::V, NoteLength::full, alias);
+        writeNote(ust, ++notecounter, filecounter, RecType::V, NoteLength::full, "R");
+    }
+    return;
+}
+
+void generate_vcv(std::ofstream &reclist, std::ofstream otoini, const int &SYL_MAX, const string &outputDir) {
+    return;
+}
+void generate_vccv(std::ofstream &reclist, std::ofstream otoini, const std::string &&VCCV_SYL, const int &SYL_MAX){
+    return;
+}

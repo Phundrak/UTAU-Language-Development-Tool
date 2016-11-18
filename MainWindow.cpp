@@ -24,12 +24,6 @@ constexpr int MAXCHARBUTTON2 = 60;
 vs consonants;
 vs vowels;
 std::string vccv_vowels;
-// selection of either \ or / as the separator in folder and file path depending on the OS the tool has been compiled on
-#if (defined (__WIN32__) || defined (_WIN32)) && !defined (__MINGW32__)
-    std::string SEP = "\\";
-#else
-    std::string SEP = "/";
-#endif
 
 
 MainWindow::MainWindow() : QWidget()
@@ -92,8 +86,8 @@ MainWindow::MainWindow() : QWidget()
     m_numberSyl = new QSlider(Qt::Horizontal, this);
     m_numberSyl->setValue(5);
     m_numberSyl->setTickInterval(1);
-    m_numberSyl->setMinimum(3);
-    m_numberSyl->setMaximum(10);
+    m_numberSyl->setMinimum(2);
+    m_numberSyl->setMaximum(12);
     m_labelValNumSyl = new QLabel(QString::number(m_numberSyl->value()), this);
 
     m_labelchoseOutDir = new QLabel("5. Choose the output directory:", this);
@@ -151,6 +145,9 @@ MainWindow::MainWindow() : QWidget()
 
     QObject::connect(m_buttonVCCV, SIGNAL(toggled(bool)), m_buttonCVVC, SLOT(setChecked(bool)));
     QObject::connect(m_buttonVCCV, SIGNAL(toggled(bool)), m_buttonCVVC, SLOT(setDisabled(bool)));
+
+    QObject::connect(m_buttonVCV, SIGNAL(toggled(bool)), m_buttonVV, SLOT(setChecked(bool)));
+    QObject::connect(m_buttonVCV, SIGNAL(toogled(bool)), m_buttonVV, SLOT(setDisabled(bool)));
 
     // this is supposed to show progress in the progress bars, not sure these will be used though
     QObject::connect(m_mainProgress, SIGNAL(valueChanged(int)), this, SLOT(estimateGenerationDone(int)));
@@ -274,6 +271,8 @@ const void MainWindow::return_error(const int& error_code) noexcept {
 
 using namespace std;
 void MainWindow::generate(){
+    OUTPUT_DIR = (m_outputDir.toStdString() + SEP).c_str();
+
     ifstream in_consonants{m_inputCons.toStdString()}, in_vowels{m_inputVow.toStdString()};
     if(m_outputDir == "" || m_inputCons == "" || m_inputVow == ""){
         QMessageBox::critical(this, "Error in selected file", "Error:\nYou haven't chosen either a file or an output directory.\nPlease check your settings and try again.");
@@ -289,7 +288,7 @@ void MainWindow::generate(){
     }
     // for debug purpose only
 //    QMessageBox::information(this, "", m_outputDir + QString::fromStdString(SEP) + "reclist.txt");
-    ofstream reclist{m_outputDir.toStdString() + SEP + "reclist.txt"}, otoini{m_outputDir.toStdString() + SEP + "oto.ini"};
+    ofstream reclist{OUTPUT_DIR + "reclist.txt"}, otoini{OUTPUT_DIR + "oto.ini"};
     // if there is any issue with the output file, end the generation
     if(!reclist) {
         return_error(3);
@@ -299,6 +298,7 @@ void MainWindow::generate(){
         return;
     }
 
+    const int MAX_VALUE = m_numberSyl->value();
 
     load_phonemes(in_consonants, in_vowels);
     if(m_buttonVCCV->isChecked()){
@@ -334,13 +334,28 @@ void MainWindow::generate(){
     }
     recap += "\n";
     recap += "\nInput files:\n" + m_inputCons.toStdString() + "\n" + m_inputVow.toStdString() + "\n";
-    recap += "\nOutput directory:\n" + m_outputDir.toStdString() + "\n";
+    recap += "\nOutput directory:\n" + OUTPUT_DIR + "\n";
     QMessageBox::information(this, "Recap", QString::fromStdString(recap));
 
-    /*
-     * generation of the reclist, oto.ini and ust's goes there
-     * */
+    if(m_buttonStat->isChecked()){
+        generate_v(reclist, otoini, OUTPUT_DIR);
+    }
+    if(m_buttonVV->isChecked()){
+        generate_vv(reclist, otoini, MAX_VALUE, OUTPUT_DIR);
+    }
+    /*if(m_buttonVCCV->isChecked()){
+        generate_vccv(reclist, otoini, m_vccv_vowel.toStdString(), MAX_VALUE, OUTPUT_DIR);
+    } else */if(m_buttonVC->isChecked()){
+        generate_cvvc(reclist, otoini, OUTPUT_DIR);
+    } else if(m_buttonCV->isChecked()) {
+        generate_cv(reclist, otoini, OUTPUT_DIR);
+    }
+    /*if(m_buttonVCV->isChecked()){
+        generate_vcv(reclist, otoini, MAX_VALUE, OUTPUT_DIR);
+    }*/
 
-    openfolder(standardize_name(m_outputDir).toStdString());
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(m_outputDir));
+    //openfolder(standardize_name(m_outputDir));
     return;
 }

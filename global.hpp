@@ -30,3 +30,5 @@ extern const char* UST_HEADER[3];
 extern const char* UST_FOOTER;
 extern const std::string NOTE_BODY[5];
 extern const std::string OTO_BODY;
+extern std::string OUTPUT_DIR;
+extern const std::string SEP;

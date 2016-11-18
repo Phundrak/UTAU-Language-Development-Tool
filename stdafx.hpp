@@ -21,7 +21,7 @@
 
 #define REP(i, a, b) for(auto i = a; i < b; i++)
 
-//Qt-related libraries
+// Qt-related libraries
 #include <QtWidgets/QApplication>
 #include <QString>
 #include <QMessageBox>
@@ -34,17 +34,18 @@
 #include <QGridLayout>
 #include <QSlider>
 
-//C++ standard libraries
+// C++ standard libraries
 #include <vector>
 #include <string>
 #include <fstream>
 #include <stdlib.h>
 
-//user-created libraries
+// user-created libraries
 #include "MainWindow.hpp"
 #include "additionalfunc.hpp"
 #include "global.hpp"
+#include "generation.hpp"
 
-
-
+// aliases
 using vs = std::vector<std::string>;
+
