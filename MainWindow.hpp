@@ -66,7 +66,7 @@ private:
     QString m_inputVow;
 
     // will be used in the VCCV generation, not yet used
-    QString m_vccv_vowel;
+    std::string m_vccv_vowel;
 
     // generic part of the message if a file could not be opened (writing or reading)
     const QString ERROR_MESSAGE = "\") could not be opened. Please check that this file exist in the same directory as this tool. It might also be opened in another software which prevents the file from being opened by another software (such as this tool). Please close it first and after that run again this tool.  \n";

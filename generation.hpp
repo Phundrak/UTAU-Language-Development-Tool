@@ -22,19 +22,19 @@
 #include "stdafx.hpp"
 
 // generates CV recordings
-void generate_cv(std::ofstream &reclist, std::ofstream &otoini, const std::string &outputDir);
+void generate_cv(std::ofstream &reclist, std::ofstream &otoini);
 
 // generates CVVC recordings
-void generate_cvvc(std::ofstream &reclist, std::ofstream &otoini, const std::string &outputDir);
+void generate_cvvc(std::ofstream &reclist, std::ofstream &otoini);
 
 // generates VV recordings
-void generate_vv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_MAX, const std::string &outputDir);
+void generate_vv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_MAX);
 
 // generates stationaries recordings
-void generate_v(std::ofstream &reclist, std::ofstream &otoini, const std::string &outputDir);
+void generate_v(std::ofstream &reclist, std::ofstream &otoini);
 
 // generates VCV recordings
-void generate_vcv(std::ofstream &reclist, std::ofstream otoini, const int &SYL_MAX, const std::string &outputDir);
+void generate_vcv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_MAX, const std::string &outputDir);
 
 // generates VCCV recordings, calls also generate_cvvc()
-void generate_vccv(std::ofstream &reclist, std::ofstream otoini, const std::string VCCV_SYL, const int &SYL_MAX, const std::string &outputDir);
+void generate_vccv(std::ofstream &reclist, std::ofstream &otoini, const std::string &VCCV_SYL, const int &SYL_MAX);

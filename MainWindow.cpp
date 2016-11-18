@@ -55,6 +55,7 @@ MainWindow::MainWindow() : QWidget()
 
     m_buttonVC = new QCheckBox("VC", this);
     m_buttonVC->setCursor(Qt::PointingHandCursor);
+    m_buttonVC->setVisible(false);
 
     m_buttonVCV = new QCheckBox("VCV", this);
     m_buttonVCV->setCursor(Qt::PointingHandCursor);
@@ -74,11 +75,11 @@ MainWindow::MainWindow() : QWidget()
     m_buttonVCCV->setCursor(Qt::PointingHandCursor);
 
     m_recTypeLayout->addWidget(m_buttonCV, 0, 0);
-    m_recTypeLayout->addWidget(m_buttonVC, 0, 1);
-    m_recTypeLayout->addWidget(m_buttonVCV, 1, 0);
-    m_recTypeLayout->addWidget(m_buttonVV, 1, 1);
-    m_recTypeLayout->addWidget(m_buttonStat, 1, 2);
-    m_recTypeLayout->addWidget(m_buttonCVVC, 2, 0);
+    m_recTypeLayout->addWidget(m_buttonCVVC, 0, 1);
+    m_recTypeLayout->addWidget(m_buttonVC, 0, 2);
+    m_recTypeLayout->addWidget(m_buttonVV, 1, 0);
+    m_recTypeLayout->addWidget(m_buttonStat, 1, 1);
+    m_recTypeLayout->addWidget(m_buttonVCV, 2, 0);
     m_recTypeLayout->addWidget(m_buttonVCCV, 2, 1);
 
 
@@ -98,9 +99,12 @@ MainWindow::MainWindow() : QWidget()
     m_buttonGenerate = new QPushButton("6. Generate", this);
     m_buttonGenerate->setCursor(Qt::PointingHandCursor);
 
-    m_secondaryProgress = new QProgressBar(this);
-
     m_mainProgress = new QProgressBar(this);
+    m_mainProgress->setVisible(false);
+
+    m_secondaryProgress = new QProgressBar(this);
+    m_secondaryProgress->setVisible(false);
+
 
     m_buttonQuit = new QPushButton("&Quit", this);
     m_buttonQuit->setCursor(Qt::PointingHandCursor);
@@ -137,9 +141,10 @@ MainWindow::MainWindow() : QWidget()
 
     // if the CVVC option is selected, it will automatically select the CV and VC options
     QObject::connect(m_buttonCVVC, SIGNAL(toggled(bool)), m_buttonCV, SLOT(setDisabled(bool)));
-    QObject::connect(m_buttonCVVC, SIGNAL(toggled(bool)), m_buttonCV, SLOT(setChecked(bool)));
+    QObject::connect(m_buttonCVVC, SIGNAL(toggled(bool)), m_buttonCV, SLOT(setChecked(true)));
     QObject::connect(m_buttonCVVC, SIGNAL(toggled(bool)), m_buttonVC, SLOT(setDisabled(bool)));
     QObject::connect(m_buttonCVVC, SIGNAL(toggled(bool)), m_buttonVC, SLOT(setChecked(bool)));
+    QObject::connect(m_buttonVC, SIGNAL(toggled(bool)), m_buttonCVVC, SLOT(setChecked(bool)));
 
     QObject::connect(m_buttonVV, SIGNAL(toggled(bool)), this, SLOT(vvChecked(bool)));
 
@@ -147,7 +152,7 @@ MainWindow::MainWindow() : QWidget()
     QObject::connect(m_buttonVCCV, SIGNAL(toggled(bool)), m_buttonCVVC, SLOT(setDisabled(bool)));
 
     QObject::connect(m_buttonVCV, SIGNAL(toggled(bool)), m_buttonVV, SLOT(setChecked(bool)));
-    QObject::connect(m_buttonVCV, SIGNAL(toogled(bool)), m_buttonVV, SLOT(setDisabled(bool)));
+    QObject::connect(m_buttonVCV, SIGNAL(toggled(bool)), m_buttonVV, SLOT(setDisabled(bool)));
 
     // this is supposed to show progress in the progress bars, not sure these will be used though
     QObject::connect(m_mainProgress, SIGNAL(valueChanged(int)), this, SLOT(estimateGenerationDone(int)));
@@ -298,7 +303,7 @@ void MainWindow::generate(){
         return;
     }
 
-    const int MAX_VALUE = m_numberSyl->value();
+    const int SYL_MAX = m_numberSyl->value();
 
     load_phonemes(in_consonants, in_vowels);
     if(m_buttonVCCV->isChecked()){
@@ -309,7 +314,7 @@ void MainWindow::generate(){
         bool ok;
         QString vccv_vowel = QInputDialog::getItem(this, tr("QInputDialog::getItem()"), tr("VCCV vowel:"), q_list_vowels, 0, false, &ok);
         if(ok && !vccv_vowel.isEmpty()){
-            m_vccv_vowel = vccv_vowel;
+            m_vccv_vowel = vccv_vowel.toStdString();
         } else {
             QMessageBox::critical(this, "No vowel chosen", "Error:\nNo vowel was chosen for the VCCV recordings. Please try again and choose a vowel.");
         }
@@ -338,20 +343,20 @@ void MainWindow::generate(){
     QMessageBox::information(this, "Recap", QString::fromStdString(recap));
 
     if(m_buttonStat->isChecked()){
-        generate_v(reclist, otoini, OUTPUT_DIR);
+        generate_v(reclist, otoini);
     }
     if(m_buttonVV->isChecked()){
-        generate_vv(reclist, otoini, MAX_VALUE, OUTPUT_DIR);
+        generate_vv(reclist, otoini, SYL_MAX);
     }
-    /*if(m_buttonVCCV->isChecked()){
-        generate_vccv(reclist, otoini, m_vccv_vowel.toStdString(), MAX_VALUE, OUTPUT_DIR);
-    } else */if(m_buttonVC->isChecked()){
-        generate_cvvc(reclist, otoini, OUTPUT_DIR);
+    if(m_buttonVCCV->isChecked()){
+        generate_vccv(reclist, otoini, m_vccv_vowel, SYL_MAX);
+    } else if(m_buttonVC->isChecked()){
+        generate_cvvc(reclist, otoini);
     } else if(m_buttonCV->isChecked()) {
-        generate_cv(reclist, otoini, OUTPUT_DIR);
+        generate_cv(reclist, otoini);
     }
     /*if(m_buttonVCV->isChecked()){
-        generate_vcv(reclist, otoini, MAX_VALUE, OUTPUT_DIR);
+        generate_vcv(reclist, otoini, SYL_MAX, OUTPUT_DIR);
     }*/
 
 

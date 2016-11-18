@@ -21,7 +21,7 @@
 
 using namespace std;
 
-void generate_cv(std::ofstream &reclist, std::ofstream &otoini, const string &outputDir) {
+void generate_cv(std::ofstream &reclist, std::ofstream &otoini) {
     string filename;
     string alias;
     int filecounter = 0;
@@ -47,7 +47,7 @@ void generate_cv(std::ofstream &reclist, std::ofstream &otoini, const string &ou
     return;
 }
 
-void generate_cvvc(std::ofstream &reclist, std::ofstream &otoini, const string &outputDir) {
+void generate_cvvc(std::ofstream &reclist, std::ofstream &otoini) {
     string filename;
     string alias;
     int filecounter = 0;
@@ -61,7 +61,7 @@ void generate_cvvc(std::ofstream &reclist, std::ofstream &otoini, const string &
             if(notecounter > 950){
                 ust = generateUST(RecType::CVVC, filecounter, notecounter, ust);
             }
-            filename = "CVVC" + num_to_string(++recCounter) + "_" + consonants[i] + vowels[j] + consonants[i] + vowels[j];
+            filename = "CVVC" + num_to_string(++recCounter) + "_" + consonants[i] + vowels[j] + consonants[i] + vowels[j] + consonants[i];
             reclist << filename + "\n";
             if(!silToCons){
                 writeAlias(otoini, filename, "- " + consonants[i], OtoType::CV);
@@ -82,13 +82,10 @@ void generate_cvvc(std::ofstream &reclist, std::ofstream &otoini, const string &
     return;
 }
 
-void generate_vv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_MAX, const string &outputDir) {
+void generate_vv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_MAX) {
     string filename;
     //string alias;
-    int filecounter = 0;
-    int notecounter = 0;
-    int reccounter = 0;
-    int sylCount = 0;
+    int filecounter = 0, notecounter = 0, reccounter = 0, sylCount = 0;
     vector<string> syllables;
     ofstream ust = generateUST(RecType::VV, filecounter, notecounter);
     for(size_t i = 0; i < vowels.size(); i++){
@@ -130,7 +127,7 @@ void generate_vv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_M
 
         if(!toSil){
             syllables.push_back(vowels[i] + " -");
-            toSil = true;
+            //toSil = true;
         }
         writeRecOto(reclist, otoini, ust, notecounter, filecounter, RecType::VV, filename, syllables, OtoType::VV);
         while (syllables.size() > 0){
@@ -143,7 +140,7 @@ void generate_vv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_M
     return;
 }
 
-void generate_v(std::ofstream &reclist, std::ofstream &otoini, const string &outputDir) {
+void generate_v(std::ofstream &reclist, std::ofstream &otoini) {
     string filename;
     string alias;
     int filecounter = 0, notecounter = 0, recCounter = 0;
@@ -163,8 +160,46 @@ void generate_v(std::ofstream &reclist, std::ofstream &otoini, const string &out
 }
 
 void generate_vcv(std::ofstream &reclist, std::ofstream otoini, const int &SYL_MAX, const string &outputDir) {
-    return;
+    
 }
-void generate_vccv(std::ofstream &reclist, std::ofstream otoini, const std::string &&VCCV_SYL, const int &SYL_MAX){
+void generate_vccv(std::ofstream &reclist, std::ofstream &otoini, const std::string &VCCV_SYL, const int &SYL_MAX) {
+    string filename;
+    string alias;
+    int filecounter = 0, notecounter = 0, recCounter = 0, sylCount = 0;
+    vector<string> syllables;
+    ofstream ust = generateUST(RecType::VCCV, filecounter, notecounter);
+
+    for(size_t i = 0; i < consonants.size(); i++){
+        filename = "VCCV" + num_to_string(++recCounter) + "_";
+        for(size_t j = 0; j < consonants.size(); j++){
+            if(notecounter > 950){
+                generateUST(RecType::VCCV, filecounter, notecounter, ust);
+            }
+            if(sylCount > SYL_MAX){
+                writeRecOto(reclist, otoini, ust, notecounter, filecounter, RecType::VCCV, filename, syllables, OtoType::CC);
+                while(syllables.size() > 0){
+                    syllables.pop_back();
+                }
+                sylCount = 0;
+                filename = "VCCV" + num_to_string(++recCounter) + "_";
+            }
+
+            syllables.push_back(consonants[i] + " " + consonants[j]);
+            if(sylCount != 0){
+                filename += " ";
+            }
+            filename += VCCV_SYL + consonants[i] + consonants[j] + VCCV_SYL;
+            sylCount++;
+        }
+        writeRecOto(reclist, otoini, ust, notecounter, filecounter, RecType::VCCV, filename, syllables, OtoType::CC);
+        while(syllables.size() > 0){
+            syllables.pop_back();
+        }
+        sylCount = 0;
+    }
+
+    generate_cvvc(reclist, otoini);
+
+    closeUST(ust);
     return;
 }

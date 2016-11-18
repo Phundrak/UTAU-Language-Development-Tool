@@ -29,6 +29,7 @@ std::string replaceAll(std::string str, const std::string&& from, const std::str
 QString standardize_name(QString str);
 
 // opens with the default file manager the output folder
+// NOT IN USE ANYMORE
 void openfolder(const QString &folder) noexcept;
 
 // loads the phonemes from the input files
@@ -58,10 +59,10 @@ void closeUST(std::ofstream& file) noexcept ;
 
 // converts a numeral to a string
 template<typename T>
-std::string num_to_string(T&& num);
+std::string num_to_string(T&& num) noexcept;
 
 // writes a note to the passed ust file using the lyrics passed in the last argument
-void writeNote(std::ofstream &ustFile, int notecounter, int &filecounter, const RecType rectype, const NoteLength length, const std::string lyrics);
+void writeNote(std::ofstream &ustFile, int notecounter, int &filecounter, const RecType rectype, const NoteLength length, const std::string lyrics) noexcept;
 
 // writes a oto.ini line in the passed oto.ini file with the alias passed in the alias argument and uses the
 // oto.ini preset fetched with the otoType

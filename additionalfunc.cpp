@@ -47,6 +47,7 @@ QString standardize_name(QString str){
 #endif
 }
 
+// NOT IN USE ANYMORE
 void openfolder(const QString &folder) noexcept {
     QString command;
 
@@ -154,7 +155,7 @@ void closeUST(std::ofstream &file) noexcept {
 }
 
 template<typename T>
-string num_to_string(T&& num){
+string num_to_string(T&& num) noexcept {
     if (num < 10){
         return "000" + to_string(num);
     } else if (num < 100) {
@@ -166,7 +167,7 @@ string num_to_string(T&& num){
     }
 }
 
-void writeNote(std::ofstream &ustFile, int notecounter, int &filecounter, const RecType rectype, const NoteLength length, const std::string lyrics = "R"){
+void writeNote(std::ofstream &ustFile, int notecounter, int &filecounter, const RecType rectype, const NoteLength length, const std::string lyrics = "R") noexcept{
     string notecount;
     if(notecounter > 950){
         ustFile = generateUST(rectype, filecounter, notecounter, ustFile);
@@ -194,8 +195,6 @@ void writeRecOto(std::ofstream &reclist, std::ofstream &otoini, std::ofstream &u
         writeAlias(otoini, filename, alias, otoType);
         writeNote(ust, notecounter, filecounter, recType, NoteLength::full, alias);
     }
-
-
 
 }
 
