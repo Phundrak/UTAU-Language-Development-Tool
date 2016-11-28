@@ -34,7 +34,7 @@ void generate_vv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_M
 void generate_v(std::ofstream &reclist, std::ofstream &otoini) noexcept;
 
 // generates VCV recordings
-void generate_vcv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_MAX, const std::string &outputDir) noexcept;
+void generate_vcv(std::ofstream &reclist, std::ofstream &otoini, const int &SYL_MAX) noexcept;
 
 // generates VCCV recordings, calls also generate_cvvc()
 void generate_vccv(std::ofstream &reclist, std::ofstream &otoini, const std::string &VCCV_SYL, const int &SYL_MAX) noexcept;

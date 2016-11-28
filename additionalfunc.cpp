@@ -100,6 +100,8 @@ std::string get_preset_oto(const OtoType preset) noexcept {
             return ",1000,90,1000,15,30";
         case OtoType::STAT:
             return ",1000,60,1000,60,60";
+        case OtoType ::VCV:
+            return ",1000,90,1000,90,90";
     }
 }
 
@@ -167,13 +169,13 @@ string num_to_string(T&& num) noexcept {
     }
 }
 
-void writeNote(std::ofstream &ustFile, int notecounter, int &filecounter, const RecType rectype, const NoteLength length, const std::string lyrics = "R") noexcept{
+void writeNote(std::ofstream &ustFile, int &notecounter, int &filecounter, const RecType rectype, const NoteLength length, const std::string lyrics = "R") noexcept{
     string notecount;
     if(notecounter > 950){
         ustFile = generateUST(rectype, filecounter, notecounter, ustFile);
     }
 
-    notecount = num_to_string(notecounter);
+    notecount = num_to_string(++notecounter);
 
     ustFile << NOTE_BODY[0] << notecount << NOTE_BODY[1] << length << NOTE_BODY[2] << lyrics;
     if(lyrics == "R"){

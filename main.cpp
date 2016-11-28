@@ -25,6 +25,8 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 
+    // TODO: add in the GUI the option to reload the input files.
+
     // just launches the GUI, nothing spectacular to see here, everything happen in the other files
     QApplication app(argc, argv);
     MainWindow window;

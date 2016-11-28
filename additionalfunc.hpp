@@ -36,7 +36,7 @@ void openfolder(const QString &folder) noexcept;
 void load_phonemes(std::ifstream& in_consonants, std::ifstream& in_vowels) noexcept;
 
 // type of oto.ini, used when writing the oto.ini file
-enum class OtoType{ VV, V, CV, VC, CC, CCV, VCC, STAT};
+enum class OtoType{ VV, V, CV, VC, CC, CCV, VCC, VCV, STAT};
 
 // type of recording, used when writing ust files
 enum class RecType{ VV, V, CV, CVVC, VC, VCV, VCCV, STAT};
@@ -62,7 +62,7 @@ template<typename T>
 std::string num_to_string(T&& num) noexcept;
 
 // writes a note to the passed ust file using the lyrics passed in the last argument
-void writeNote(std::ofstream &ustFile, int notecounter, int &filecounter, const RecType rectype, const NoteLength length, const std::string lyrics) noexcept;
+void writeNote(std::ofstream &ustFile, int &notecounter, int &filecounter, const RecType rectype, const NoteLength length, const std::string lyrics) noexcept;
 
 // writes a oto.ini line in the passed oto.ini file with the alias passed in the alias argument and uses the
 // oto.ini preset fetched with the otoType

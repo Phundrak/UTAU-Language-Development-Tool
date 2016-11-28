@@ -24,6 +24,7 @@ constexpr int MAXCHARBUTTON2 = 60;
 vs consonants;
 vs vowels;
 std::string vccv_vowels;
+bool recap_written = false;
 
 
 MainWindow::MainWindow() : QWidget()
@@ -305,18 +306,22 @@ void MainWindow::generate(){
 
     const int SYL_MAX = m_numberSyl->value();
 
-    load_phonemes(in_consonants, in_vowels);
+    if(!recap_written){
+        load_phonemes(in_consonants, in_vowels);
+        recap_written = true;
+    }
     if(m_buttonVCCV->isChecked()){
         QStringList q_list_vowels;
         for(auto vowel : vowels){
             q_list_vowels.append(QString::fromStdString(vowel));
         }
         bool ok;
-        QString vccv_vowel = QInputDialog::getItem(this, tr("QInputDialog::getItem()"), tr("VCCV vowel:"), q_list_vowels, 0, false, &ok);
+        QString vccv_vowel = QInputDialog::getItem(this, tr("Chose your VCCV vowel"), tr("VCCV vowel:"), q_list_vowels, 0, false, &ok);
         if(ok && !vccv_vowel.isEmpty()){
             m_vccv_vowel = vccv_vowel.toStdString();
         } else {
             QMessageBox::critical(this, "No vowel chosen", "Error:\nNo vowel was chosen for the VCCV recordings. Please try again and choose a vowel.");
+            return;
         }
     }
 
@@ -345,9 +350,6 @@ void MainWindow::generate(){
     if(m_buttonStat->isChecked()){
         generate_v(reclist, otoini);
     }
-    if(m_buttonVV->isChecked()){
-        generate_vv(reclist, otoini, SYL_MAX);
-    }
     if(m_buttonVCCV->isChecked()){
         generate_vccv(reclist, otoini, m_vccv_vowel, SYL_MAX);
     } else if(m_buttonVC->isChecked()){
@@ -355,9 +357,11 @@ void MainWindow::generate(){
     } else if(m_buttonCV->isChecked()) {
         generate_cv(reclist, otoini);
     }
-    /*if(m_buttonVCV->isChecked()){
-        generate_vcv(reclist, otoini, SYL_MAX, OUTPUT_DIR);
-    }*/
+    if(m_buttonVCV->isChecked()){
+        generate_vcv(reclist, otoini, SYL_MAX);
+    } else if(m_buttonVV->isChecked()){
+        generate_vv(reclist, otoini, SYL_MAX);
+    }
 
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(m_outputDir));
